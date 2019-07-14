@@ -1,0 +1,2 @@
+--Find all tables that containing columns with a specified name
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE column_name = 'EventName';
