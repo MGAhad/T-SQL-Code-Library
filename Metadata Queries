@@ -1,0 +1,62 @@
+--Constraints
+SELECT c.TABLE_CATALOG,
+       c.TABLE_SCHEMA,
+       c.TABLE_NAME,
+       c.COLUMN_NAME,
+       c.ORDINAL_POSITION,
+       c.IS_NULLABLE,
+       c.DATA_TYPE,
+       u.CONSTRAINT_CATALOG,
+       u.CONSTRAINT_SCHEMA,
+       u.CONSTRAINT_NAME,
+       u.TABLE_CATALOG,
+       u.TABLE_NAME,
+       u.TABLE_NAME,
+       u.CONSTRAINT_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS AS c
+     LEFT JOIN information_schema.table_constraints AS u ON c.table_name = u.table_name
+ORDER BY c.table_name;
+
+--List of all Schemas and Tables
+select * from INFORMATION_SCHEMA.TABLES
+
+
+-- The following SQL statement will pull all Stored-Procedures &amp; Functions in the Database.
+select c.id, object_name(c.id) as obj_name_c, o.name as obj_name_o, o.xtype, c.text, o.crdate, o.refdate
+from sys.syscomments c
+join sys.sysobjects o
+on o.id = c.id
+where xtype in ('P', 'FN')
+-- This following SQL statement will pull all Objects information with in the Database.
+select c.id, object_name(c.id) as obj_name_c, -- o.name
+    case xtype
+        when 'C' then 'Check Constraint'
+        when 'D' then 'Default Constraint'
+        when 'F' then 'Foreign Key Constraint'
+        when 'L' then 'Log'
+        when 'P' then 'Stored Procedure'
+        when 'PK' then 'Primary Key Constraint'
+        when 'RF' then 'Replication Filter Procedure'
+        when 'S' then 'System Table'
+        when 'TR' then 'Trigger'
+        when 'U' then 'User Table'
+        when 'UQ' then 'Unique Constraint'
+        when 'V' then 'View'
+        when 'X' then 'Extended Procedure'
+        when 'FN' then 'User Defined Function'
+        else 'N/A'
+    end as obj_type,
+    c.text, o.crdate, o.refdate
+from sys.syscomments c
+join sys.sysobjects o
+on o.id = c.id
+ 
+-- Pulls Foreign Key and its links
+select fk.name as fk_name, fk.object_id, object_name(fk.parent_object_id) as table_name,
+    col_name(fc.parent_object_id, fc.parent_column_id) as constraint_col_name,
+    object_name(fk.referenced_object_id) as referenced_table,
+    COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS referenced_col_name,
+    fk.delete_referential_action_desc
+from sys.foreign_keys fk
+join sys.foreign_key_columns fc
+on fk.object_id = fc.constraint_object_id
